@@ -1,0 +1,14 @@
+{
+  "users": [
+    {
+      "id": "a36c1127-ac30-432e-8205-6255a83f68e0",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "passwordHash": "$2b$12$rTKRdbNS..R2mW1UQtO4ZObOe3.ZCQ8r7OB1YuDWqwXBftznmGHYC",
+      "role": "tester",
+      "createdAt": "2026-09-03T18:08:38.801Z",
+      "updatedAt": "2026-09-03T18:08:38.801Z",
+      "lastLoginAt": null
+    }
+  ]
+}

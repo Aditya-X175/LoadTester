@@ -1,0 +1,79 @@
+{
+  "sessions": [
+    {
+      "id": "bb6cf89e-9ece-4a53-b030-3d94f4e9238c",
+      "name": "Production API Baseline — Q3 2026",
+      "targetSystem": "checkout-service.prod.example.com",
+      "environment": "prod",
+      "testTool": "k6",
+      "testerName": "Sarah Chen",
+      "notes": "Baseline load test for Q3 capacity planning. Target: 500 stable VUs.",
+      "status": "degraded",
+      "breakingPointVU": 550,
+      "errorRateThreshold": 5,
+      "p95LatencyThreshold": 2000,
+      "createdAt": "2026-08-27T17:49:44.733Z",
+      "updatedAt": "2026-09-03T17:49:44.735Z"
+    },
+    {
+      "id": "4a54fbd8-2927-4203-869c-e92a7b2c8e2e",
+      "name": "Checkout Service — Post-Optimization Staging",
+      "targetSystem": "checkout-service.staging.example.com",
+      "environment": "staging",
+      "testTool": "JMeter",
+      "testerName": "Marcus Reid",
+      "notes": "After DB connection pool and query optimizations. Testing if we can push stable VU beyond 700.",
+      "status": "pass",
+      "breakingPointVU": 750,
+      "errorRateThreshold": 5,
+      "p95LatencyThreshold": 2000,
+      "createdAt": "2026-08-31T17:49:44.745Z",
+      "updatedAt": "2026-09-03T17:49:44.746Z"
+    },
+    {
+      "id": "a4df9fd9-2734-402e-8262-a32807a95223",
+      "name": "Auth Service — Locust Smoke Test",
+      "targetSystem": "auth-service.dev.example.com",
+      "environment": "dev",
+      "testTool": "Locust",
+      "testerName": "Priya Nair",
+      "notes": "Quick dev smoke test — low VU count. Not a capacity test.",
+      "status": "pass",
+      "breakingPointVU": null,
+      "errorRateThreshold": 10,
+      "p95LatencyThreshold": 3000,
+      "createdAt": "2026-09-02T17:49:44.752Z",
+      "updatedAt": "2026-09-03T17:49:44.753Z"
+    },
+    {
+      "id": "1a46c276-5baa-4e05-9a9d-8206a84e3c14",
+      "name": "Payment Gateway — Gatling Stress Test",
+      "targetSystem": "payment-gw.staging.example.com",
+      "environment": "staging",
+      "testTool": "Gatling",
+      "testerName": "Alex Johansson",
+      "notes": "Stress test for Black Friday preparation. Max load scenario.",
+      "status": "running",
+      "breakingPointVU": null,
+      "errorRateThreshold": 5,
+      "p95LatencyThreshold": 1500,
+      "createdAt": "2026-09-03T15:49:44.760Z",
+      "updatedAt": "2026-09-03T17:49:44.760Z"
+    },
+    {
+      "id": "e375f92b-0e9a-4fb9-ab58-cf7d6c8b582e",
+      "name": "Search Service — Artillery Peak Test",
+      "targetSystem": "search-svc.prod.example.com",
+      "environment": "prod",
+      "testTool": "Artillery",
+      "testerName": "Sarah Chen",
+      "notes": "Search service collapsed early. Needs caching layer before re-test.",
+      "status": "fail",
+      "breakingPointVU": 300,
+      "errorRateThreshold": 5,
+      "p95LatencyThreshold": 2000,
+      "createdAt": "2026-08-20T17:49:44.766Z",
+      "updatedAt": "2026-09-03T17:49:44.767Z"
+    }
+  ]
+}

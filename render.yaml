@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: load-tester-portal
+    env: node
+    plan: free
+    region: oregon
+    buildCommand: npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: ./server/data
+      - key: ERROR_RATE_THRESHOLD
+        value: 5
+      - key: P95_LATENCY_THRESHOLD
+        value: 2000
+      - key: AUTO_SEED
+        value: "true"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d

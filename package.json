@@ -1,0 +1,13 @@
+{
+  "name": "load-tester-portal",
+  "version": "1.0.0",
+  "description": "System Scalability Load Test Logger — Full-stack portal",
+  "scripts": {
+    "build": "npm install --prefix server && npm install --prefix client && npm run build --prefix client",
+    "start": "node server/index.js",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "seed": "cd server && npm run seed",
+    "install:all": "npm install --prefix server && npm install --prefix client"
+  }
+}
