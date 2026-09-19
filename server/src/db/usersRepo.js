@@ -7,15 +7,22 @@ const fsp = require('fs').promises;
 const fs = require('fs');
 const path = require('path');
 
-const DATA_DIR = process.env.DATA_DIR
-  ? path.resolve(process.env.DATA_DIR)
-  : path.join(__dirname, '..', '..', '..', 'data');
+function resolveDataDir() {
+  if (process.env.DATA_DIR) {
+    if (path.isAbsolute(process.env.DATA_DIR)) return process.env.DATA_DIR;
+    const fromCwd = path.resolve(process.env.DATA_DIR);
+    if (fs.existsSync(fromCwd)) return fromCwd;
+  }
+  return path.resolve(__dirname, '..', '..', 'data');
+}
 
+const DATA_DIR = resolveDataDir();
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
 
 async function ensureUsersFile() {
+  await fsp.mkdir(DATA_DIR, { recursive: true });
   if (!fs.existsSync(USERS_FILE)) {
-    await fsp.writeFile(USERS_FILE, JSON.stringify({ users: [] }, null, 2));
+    await fsp.writeFile(USERS_FILE, JSON.stringify({ users: [] }, null, 2), 'utf-8');
   }
 }
 
@@ -26,9 +33,9 @@ async function readUsers() {
 }
 
 async function writeUsers(users) {
-  const os = require('os');
-  const tmp = path.join(os.tmpdir(), `ltp-users-${Date.now()}.tmp`);
-  await fsp.writeFile(tmp, JSON.stringify({ users }, null, 2));
+  await ensureUsersFile();
+  const tmp = path.join(DATA_DIR, `users-${Date.now()}-${Math.random().toString(36).slice(2)}.tmp`);
+  await fsp.writeFile(tmp, JSON.stringify({ users }, null, 2), 'utf-8');
   await fsp.rename(tmp, USERS_FILE);
 }
 
@@ -59,7 +66,7 @@ async function createUser({ name, email, password, role = 'tester' }) {
     throw err;
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
+  const passwordHash = await bcrypt.hash(password, 10);
   const users = await readUsers();
   const now = new Date().toISOString();
 
@@ -130,4 +137,17 @@ async function updateUser(id, data) {
   return safe;
 }
 
-module.exports = { createUser, findByEmail, findById, verifyPassword, getAllUsers, updateUser };
+async function ensureDefaultDemoUser() {
+  const existing = await findByEmail('demo@loadportal.io');
+  if (!existing) {
+    await createUser({
+      name: 'Demo Engineer',
+      email: 'demo@loadportal.io',
+      password: 'Password123!',
+      role: 'tester',
+    });
+    console.log('✅ Default demo user verified: demo@loadportal.io / Password123!');
+  }
+}
+
+module.exports = { createUser, findByEmail, findById, verifyPassword, getAllUsers, updateUser, ensureDefaultDemoUser };

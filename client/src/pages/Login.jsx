@@ -1,13 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Activity, Lock, Mail, User, ArrowRight, ShieldCheck, Zap, Sparkles, CheckCircle2 } from 'lucide-react'
+import { Activity, Lock, Mail, User, ArrowRight, ShieldCheck, Zap, Sparkles, CheckCircle2, KeyRound } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { login, register } = useAuth()
+  const { login, register, isAuthenticated } = useAuth()
+
+  // If already authenticated, redirect to dashboard
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true })
+    }
+  }, [isAuthenticated, navigate])
 
   // Determine mode: 'login' or 'register'
   const [isRegister, setIsRegister] = useState(() => {
@@ -50,19 +57,33 @@ export default function Login() {
       } else {
         const data = await login(formData.email, formData.password)
         toast.success(data.message || 'Logged in successfully!')
-        navigate(location.state?.from || '/dashboard')
+        const destination = (location.state?.from && location.state.from !== '/login')
+          ? location.state.from
+          : '/dashboard'
+        navigate(destination)
       }
     } catch (err) {
       const msg = err.response?.data?.error ||
         err.response?.data?.details?.[0]?.message ||
-        'Authentication failed. Please check your inputs.'
+        'Authentication failed. Please check your credentials.'
       toast.error(msg)
     } finally {
       setLoading(false)
     }
   }
 
-  // Pre-fill demo for quick review if user wants
+  // Pre-fill demo login credentials
+  const handleFillDemoLogin = () => {
+    setIsRegister(false)
+    setFormData((prev) => ({
+      ...prev,
+      email: 'demo@loadportal.io',
+      password: 'Password123!',
+    }))
+    toast('Loaded demo credentials: demo@loadportal.io', { icon: '🔑' })
+  }
+
+  // Pre-fill demo for quick registration
   const handleFillDemo = () => {
     setIsRegister(true)
     setFormData({
@@ -124,15 +145,23 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Demo Button */}
-          <div className="pt-2">
+          {/* Demo Helpers */}
+          <div className="pt-2 flex flex-col sm:flex-row gap-2">
+            <button
+              type="button"
+              onClick={handleFillDemoLogin}
+              className="btn btn-secondary btn-sm flex items-center gap-2 border-surface-600/70 hover:border-brand-500/40 text-slate-300 hover:text-brand-300 text-xs"
+            >
+              <KeyRound className="w-3.5 h-3.5 text-brand-400" />
+              Fill Demo Sign-in
+            </button>
             <button
               type="button"
               onClick={handleFillDemo}
               className="btn btn-secondary btn-sm flex items-center gap-2 border-surface-600/70 hover:border-brand-500/40 text-slate-300 hover:text-brand-300 text-xs"
             >
               <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-              Auto-fill sample new user registration
+              Fill New Registration
             </button>
           </div>
         </div>
@@ -175,6 +204,17 @@ export default function Login() {
                   ? 'Enter your details below to begin logging and analyzing load test sessions.'
                   : 'Enter your credentials to access your dashboards and test runs.'}
               </p>
+              {!isRegister && (
+                <div
+                  onClick={handleFillDemoLogin}
+                  className="mt-3 px-3 py-1.5 rounded-lg bg-surface-800/80 border border-brand-500/30 flex items-center justify-between text-xs cursor-pointer hover:border-brand-500/60 transition-colors"
+                >
+                  <span className="text-slate-300 font-mono text-[11px]">
+                    Demo: <strong className="text-brand-300">demo@loadportal.io</strong> / <strong className="text-slate-200">Password123!</strong>
+                  </span>
+                  <span className="text-[11px] text-brand-400 font-semibold">Click to Fill ⚡</span>
+                </div>
+              )}
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">

@@ -7,9 +7,16 @@ const fsp = require('fs').promises;
 const path = require('path');
 const os = require('os');
 
-const DATA_DIR = process.env.DATA_DIR
-  ? path.resolve(process.env.DATA_DIR)
-  : path.join(__dirname, '..', '..', '..', 'data');
+function resolveDataDir() {
+  if (process.env.DATA_DIR) {
+    if (path.isAbsolute(process.env.DATA_DIR)) return process.env.DATA_DIR;
+    const fromCwd = path.resolve(process.env.DATA_DIR);
+    if (fs.existsSync(fromCwd)) return fromCwd;
+  }
+  return path.resolve(__dirname, '..', '..', 'data');
+}
+
+const DATA_DIR = resolveDataDir();
 
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 const METRICS_FILE = path.join(DATA_DIR, 'metrics.json');
@@ -24,10 +31,10 @@ async function initDb() {
   await fsp.mkdir(DATA_DIR, { recursive: true });
 
   if (!fs.existsSync(SESSIONS_FILE)) {
-    await fsp.writeFile(SESSIONS_FILE, JSON.stringify({ sessions: [] }, null, 2));
+    await fsp.writeFile(SESSIONS_FILE, JSON.stringify({ sessions: [] }, null, 2), 'utf-8');
   }
   if (!fs.existsSync(METRICS_FILE)) {
-    await fsp.writeFile(METRICS_FILE, JSON.stringify({ metrics: [] }, null, 2));
+    await fsp.writeFile(METRICS_FILE, JSON.stringify({ metrics: [] }, null, 2), 'utf-8');
   }
   console.log(`✅ Database initialized at ${DATA_DIR}`);
 }
@@ -51,7 +58,9 @@ async function writeJson(filePath, data) {
   }
 
   writeLocks[filePath] = writeLocks[filePath].then(async () => {
-    const tmpFile = path.join(os.tmpdir(), `ltp-${Date.now()}-${Math.random().toString(36).slice(2)}.tmp`);
+    const dir = path.dirname(filePath);
+    await fsp.mkdir(dir, { recursive: true });
+    const tmpFile = path.join(dir, `ltp-${Date.now()}-${Math.random().toString(36).slice(2)}.tmp`);
     await fsp.writeFile(tmpFile, JSON.stringify(data, null, 2), 'utf-8');
     await fsp.rename(tmpFile, filePath);
   });

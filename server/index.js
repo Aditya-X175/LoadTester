@@ -13,6 +13,7 @@ const importRouter = require('./src/routes/importData');
 const errorHandler = require('./src/middleware/errorHandler');
 const { requireAuth } = require('./src/middleware/authMiddleware');
 const { initDb, readSessions } = require('./src/db/fileDb');
+const { ensureDefaultDemoUser } = require('./src/db/usersRepo');
 const { seed } = require('./seeds/seed');
 
 const app = express();
@@ -69,6 +70,13 @@ initDb().then(async () => {
     } catch (seedErr) {
       console.warn('Auto-seed check note:', seedErr.message);
     }
+  }
+
+  // Always ensure default demo user exists for seamless login
+  try {
+    await ensureDefaultDemoUser();
+  } catch (userErr) {
+    console.warn('Demo user check note:', userErr.message);
   }
 
   app.listen(PORT, '0.0.0.0', () => {
