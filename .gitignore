@@ -3,6 +3,12 @@ node_modules/
 client/node_modules/
 server/node_modules/
 
+# Lockfiles (prevent cross-platform Windows/Linux binding conflicts)
+package-lock.json
+*/package-lock.json
+**/package-lock.json
+yarn.lock
+
 # Production build
 client/dist/
 
